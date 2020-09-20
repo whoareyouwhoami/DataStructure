@@ -1,6 +1,6 @@
 /*
  * Name: YOUNG WOO JU
- * Student ID #: 201412207
+ * Student ID #: 2014122074
  */
 
 /* 
@@ -203,7 +203,6 @@ public final class Set implements ISet {
             returnArr[i] = arrSet[i];
         }
 
-        // return new int[];
         return returnArr;
     }
 }
