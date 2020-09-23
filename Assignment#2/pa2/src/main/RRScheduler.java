@@ -13,6 +13,8 @@ public final class RRScheduler implements IRRScheduler {
     /*
      * Add some variables you will use.
      */
+    ICDLList cdl = new CDLList();
+    boolean directionChange = false; // Not changed
 
     @Override
     public void insert(int id) {
@@ -23,7 +25,7 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  Insert the job at the back of the scheduler.
         */
-
+        cdl.insert(id);
     }
 
     @Override
@@ -34,7 +36,8 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  One time segment passes and the job processed is deleted
         */
-
+        timeflow(1);
+        cdl.delete();
     }
 
     @Override
@@ -46,7 +49,13 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  Simulate n time segments.
         */
-
+        for(int i=0; i<n; i++) {
+            if(!directionChange) {
+                cdl.rotateForward();
+            } else {
+                cdl.rotateBackward();
+            }
+        }
     }
 
     @Override
@@ -57,7 +66,8 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  Change the direction of the scheduler.
         */
-
+        directionChange = !directionChange;
+        System.out.println("DIRECTION CHANGED? " + directionChange);
     }
 
     @Override
@@ -68,6 +78,7 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  Return the current job.
         */
-        return 0;
+        System.out.println("CURRENT ID: " + cdl.getHead().getValue());
+        return cdl.getHead().getValue();
     }
 }
