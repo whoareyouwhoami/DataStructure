@@ -51,11 +51,13 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  Simulate n time segments.
         */
-        for(int i=0; i<n; i++) {
-            if(!directionChange) {
-                cdl.rotateForward();
-            } else {
-                cdl.rotateBackward();
+        if(!cdl.isEmpty()) {
+            for(int i=0; i<n; i++) {
+                if(!directionChange) {
+                    cdl.rotateForward();
+                } else {
+                    cdl.rotateBackward();
+                }
             }
         }
     }
