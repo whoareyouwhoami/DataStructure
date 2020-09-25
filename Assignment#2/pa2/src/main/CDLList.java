@@ -1,6 +1,6 @@
 /*
- * Name: 
- * Student ID #: 
+ * Name: Young Woo Ju
+ * Student ID #: 2014122074
  */
 
 /* 
@@ -46,7 +46,6 @@ public final class CDLList implements ICDLList {
             head.setNext(head);
             head.setPrev(head);
         }
-
         // Inserted
         linkSize++;
     }
@@ -68,9 +67,8 @@ public final class CDLList implements ICDLList {
 
             // Decrease list size
             linkSize--; 
-
         } else {
-            throw new IllegalStateException("DELETION ERROR BRO");
+            throw new IllegalStateException();
         }
     }
 
@@ -85,7 +83,7 @@ public final class CDLList implements ICDLList {
         if(!isEmpty()) {
             return head;
         } else {
-            throw new IllegalStateException("No head");
+            throw new IllegalStateException();
         }
     }
 
@@ -101,7 +99,7 @@ public final class CDLList implements ICDLList {
             // Change head to next node
             head = head.getNext();
         } else {
-            throw new IllegalStateException("ROTATE FORWARD: No head");
+            throw new IllegalStateException();
         }
     }
 
@@ -117,7 +115,7 @@ public final class CDLList implements ICDLList {
             // Change head to previous node
             head = head.getPrev();
         } else {
-            throw new IllegalStateException("ROTATE BACKWARD: No head");
+            throw new IllegalStateException();
         }
     }
 

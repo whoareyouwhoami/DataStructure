@@ -1,6 +1,6 @@
 /*
- * Name: 
- * Student ID #: 
+ * Name: Young Woo Ju
+ * Student ID #: 2014122074
  */
 
 /* 
@@ -13,8 +13,8 @@ public final class RRScheduler implements IRRScheduler {
     /*
      * Add some variables you will use.
      */
-    ICDLList cdl = new CDLList();
-    boolean directionChange = false; // Not changed
+    private ICDLList cdl = new CDLList();
+    private boolean directionChange = false;
 
     @Override
     public void insert(int id) {
@@ -36,8 +36,10 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  One time segment passes and the job processed is deleted
         */
-        timeflow(1);
-        cdl.delete();
+        if(!cdl.isEmpty()) {
+            timeflow(1);
+            cdl.delete();
+        }
     }
 
     @Override
@@ -67,7 +69,6 @@ public final class RRScheduler implements IRRScheduler {
         *  Change the direction of the scheduler.
         */
         directionChange = !directionChange;
-        System.out.println("DIRECTION CHANGED? " + directionChange);
     }
 
     @Override
@@ -78,7 +79,6 @@ public final class RRScheduler implements IRRScheduler {
         * Job:
         *  Return the current job.
         */
-        System.out.println("CURRENT ID: " + cdl.getHead().getValue());
         return cdl.getHead().getValue();
     }
 }

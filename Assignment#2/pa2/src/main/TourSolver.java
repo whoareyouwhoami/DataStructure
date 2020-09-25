@@ -1,6 +1,6 @@
 /*
- * Name: 
- * Student ID #: 
+ * Name: Young Woo Ju
+ * Student ID #: 2014122074
  */
 
 /* 
@@ -15,20 +15,23 @@ public final class TourSolver implements ITourSolver {
      */
 
     // Knight's movement
-    int[] x = {1, 2, -1, -2, 1, 2, -1, -2};
-    int[] y = {2, 1, 2, 1, -2, -1, -2, -1};
+    private int[] x = {1, 2, -1, -2, 1, 2, -1, -2};
+    private int[] y = {2, 1, 2, 1, -2, -1, -2, -1};
 
     // squareId visited status array
-    boolean[] visited = new boolean[0];
+    private boolean[] visited = new boolean[0];
 
     // Next possible path coordinates array
-    int[] possibilities = new int[0];
+    private int[] possibilities = new int[0];
 
     // Final result array
-    int[] resultArray = new int[0];
+    private int[] resultArray = new int[0];
 
     // Result array size
-    int filled = 0;
+    private int filled = 0;
+
+    // True values
+    private int trueFilled = 0;
 
     private int[] insertNum(int[] array, int num) {
         int tempSize = array.length;
@@ -39,6 +42,7 @@ public final class TourSolver implements ITourSolver {
         for(int i=0; i<array.length; i++) {
             tempArr[i] = array[i];
         }
+        
         tempArr[array.length] = num;
 
         return tempArr;
@@ -92,6 +96,30 @@ public final class TourSolver implements ITourSolver {
         return possibilities;
     }
 
+    private boolean[] getBoardMissing(Board board) {
+        // Resetting true value
+        trueFilled = 0;
+
+        // True value list
+        boolean[] tempVisited = new boolean[board.getWidth() * board.getHeight()];
+
+        for(int i = 0; i < board.getWidth(); i++) {
+            for(int j = 0; j < board.getHeight(); j++) {
+                // Cell index
+                int cell = board.squareId(i,j);
+
+                // Duplicate board missing status
+                if(board.isMissing(i,j)) {
+                    tempVisited[cell] = true;
+                    trueFilled++;
+                } else {
+                    tempVisited[cell] = false;
+                }
+            }
+        }
+        return tempVisited;
+    }
+
     private void knightTour(Board board, int w, int h) {
 
         // Retrieve possible coordinates from (w, h)
@@ -115,6 +143,7 @@ public final class TourSolver implements ITourSolver {
 
         // Change visited index -> true
         visited[board.squareId(w, h)] = true;
+        trueFilled++;
 
         // While there is a possible path from current coordinate (w, h)
         while(possibleSize > 0) {
@@ -123,11 +152,11 @@ public final class TourSolver implements ITourSolver {
             if(visited[board.squareId(possibleCoordinate[pointLeft], possibleCoordinate[pointRight])] == false) {
 
                 // If the whole square ID has not been visited
-                if(filled != boardSize) {
+                if(trueFilled != boardSize) {
                     // Repeat this method with the next possible path coordinate
                     knightTour(board, possibleCoordinate[pointLeft], possibleCoordinate[pointRight]);
                 } else {
-                    System.out.println("WHILE LOOP BREAKED!");
+                    // Exit if the every cell in the board is visited
                     break;
                 }
             }
@@ -140,10 +169,11 @@ public final class TourSolver implements ITourSolver {
 
 
         // IF there is no more possible path coordinates available
-        if(filled != boardSize && resultArray.length > 0) {
+        if(trueFilled != boardSize && resultArray.length > 0) {
 
             // Change current coordinate to false 
             visited[board.squareId(w, h)] = false;
+            trueFilled--;
 
             // Remove current coordinate squareId from result array
             removeNum();
@@ -152,9 +182,9 @@ public final class TourSolver implements ITourSolver {
             filled--;
         }
 
-
         // knightTour() END 
     }
+
 
     @Override
     public int[] solve(Board board) {
@@ -168,48 +198,29 @@ public final class TourSolver implements ITourSolver {
         */
         for(int i = 0; i < board.getWidth(); i++) {
             for(int j = 0; j < board.getHeight(); j++) {
-                System.out.println("i: " + i + " j: " + j);
-                // Resetting result array
-                resultArray = new int[0];
+                
+                // Process when squareId(i, j) is NOT missing
+                if(!board.isMissing(i, j)) {
 
-                // Resetting visited array
-                visited = new boolean[board.getWidth() * board.getHeight()];
-                for (int k = 0; k < visited.length; k++) {
-                    visited[k] = false;
-                }
+                    // Resetting result array
+                    resultArray = new int[0];
 
-                // Perfome knight's tour
-                knightTour(board, i, j);
+                    // Resetting visited array
+                    visited = getBoardMissing(board);
 
-                // Exit if answer is found
-                int maxSize = board.getWidth() * board.getHeight();
-                if(resultArray.length == maxSize) {
+                    // Perfome knight's tour
+                    knightTour(board, i, j);
+
+                    // Exit if answer is found
+                    int maxSize = board.getWidth() * board.getHeight();
                     
-                    // ======================================================
-                    // CHECKING
-                    // ======================================================
-                    System.out.print("Result : [ ");
-                    for(int m=0; m<resultArray.length; m++) {
-                        System.out.print(resultArray[m] + " ");
+                    // If true filled is equal to the board size
+                    if(trueFilled == maxSize) {
+                        return resultArray;
                     }
-                    System.out.println("] | Filled: " + filled);
-                    // ======================================================
-                    
-                    return resultArray;
                 }
             }
         }
-
-        // ======================================================
-        // CHECKING
-        // ======================================================
-        System.out.print("Result : [ ");
-        for(int m=0; m<resultArray.length; m++) {
-            System.out.print(resultArray[m] + " ");
-        }
-        System.out.println("] | Filled: " + filled);
-        // ======================================================
-        
         return resultArray;
     }
 }

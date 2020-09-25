@@ -27,4 +27,27 @@ public class TourSolverTests {
             assertThat(ans, is(new int[] { 0 }));
         });
     }
+
+    @Test
+    @Score(1)
+    public void testEmpty() {
+        assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
+            ITourSolver solver = new TourSolver();
+            Board board = new Board(0, 0);
+            int[] ans = solver.solve(board);
+            assertThat(ans, is(new int[] {}));
+        });
+    }
+
+    @Test
+    @Score(1)
+    public void testResult() {
+        assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
+            ITourSolver solver = new TourSolver();
+            Board board = new Board(5,5);
+            board.setMissing(0,0);
+            int[] ans = solver.solve(board);
+            assertThat(ans.length, is(24));
+        });
+    }
 }
