@@ -1,6 +1,6 @@
 /*
- * Name: 
- * Student ID #: 
+ * Name: Young Woo Ju
+ * Student ID #: 2014122074
  */
 
 /* 
@@ -10,16 +10,12 @@
  */
 
 public final class LISP implements ILISP {
-
-    // public IStack<Character> stack = new Stack<Character>();
-
-    // DELETE THIS AND USE ABOVE LINE BEFORE SUBMISSION!!!!
-    public Stack<Character> stack = new Stack<Character>();
-    
+    public IStack<Character> stack = new Stack<Character>();
     /*
     * Use some variables for your implementation.
     */
     private char[] bracketForm = {'(', ')', '[', ']', '{', '}'};
+
 
     public LISP() {
         /*
@@ -38,11 +34,6 @@ public final class LISP implements ILISP {
         return -1;
     }
 
-    // DELETE THIS LATER
-    private void show() {
-        stack.show();
-    }
-
     @Override
     public boolean checkBracketBalance(String expression) {
         /*
@@ -56,11 +47,11 @@ public final class LISP implements ILISP {
         *   3. The left bracket must precede the corresponding right bracket.
         *   4. Pairs of different types of brackets must not intersect each other.
         */
-        
+
         // Convert string to char
         char[] charArr = expression.toCharArray();
 
-        for(int i = charArr.length - 1; i > -1; i--) {
+        for(int i = charArr.length - 1; i >= 0; i--) {
             char bracket = charArr[i];
             int bracketIndex = getBracketIndex(bracket);
             
@@ -74,17 +65,14 @@ public final class LISP implements ILISP {
                         return false;
                     }
                 } catch(IllegalStateException e) {
-                    System.out.println("WRONG PARENTHESES MATCHING!");
                     return false;
                 }
+
             } else if(bracketIndex % 2 == 1) { // Closed bracket
                 // Push to stack
                 stack.push(bracket);
             }
         }
-
-        System.out.print("FINAL OUTPUT: ");
-        show();
         if(stack.isEmpty()) {
             return true;
         }

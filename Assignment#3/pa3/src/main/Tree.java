@@ -1,6 +1,6 @@
 /*
-* Name:
-* Student ID#:
+* Name: Young Woo Ju
+* Student ID#: 2014122074
 */
 
 /*
@@ -15,12 +15,68 @@ import java.util.List;
 import java.util.ArrayList;
 
 public final class Tree<E> implements ITree<E> {
+    // Initial arity value
+    private int arity = 0;
+
+    // Root node
+    private TreeNode<E> rootNode;
+
+    // Stack
+    private Node<TreeNode<E>> stackBottom;
+    private Node<TreeNode<E>> stackBottomTemp;
+    private Stack<TreeNode<E>> stack;
+
+    // Height
+    private int treeMaxHeight = 0;
 
     public Tree(int arity) {
         /*
         * Input:
         *  + arity: max number of node's children. always positive.
         */
+        this.arity = arity;
+    }
+
+    /*
+     * Finding height of a tree
+     */
+    private void findHeight(Stack<TreeNode<E>> treeStack, int height) {
+        TreeNode<E> topNode = treeStack.top.getValue();
+
+        if(height > treeMaxHeight) {
+            treeMaxHeight = height;
+        }
+
+        if(topNode.numChildren() > 0) {
+            height++;
+            for(int i=0; i<topNode.numChildren(); i++) {
+                treeStack.push(topNode.getChild(i));
+                findHeight(treeStack, height);
+                treeStack.pop();
+                height--;
+            }
+
+        } 
+    }
+
+    /*
+     * Pre-order
+     */
+    private void treePreOrder(TreeNode<E> node, List<E> result) {
+        result.add(node.getValue());
+        for(int i = 0; i < node.numChildren(); i++) {
+            treePreOrder(node.getChild(i), result);
+        }
+    }
+
+    /*
+     * Post-order
+     */
+    private void treePostOrder(TreeNode<E> node, List<E> result) {
+        for(int i = 0; i < node.numChildren(); i++) {
+            treePostOrder(node.getChild(i), result);
+        }
+        result.add(node.getValue());
     }
 
     @Override
@@ -29,7 +85,17 @@ public final class Tree<E> implements ITree<E> {
         * Return the root node.
         * If there is no root, raise an IllegalStateException.
         */
-        return null;
+        if(rootNode != null) {
+            // If root exist, create a stack
+            stack = new Stack<>();
+            stack.push(rootNode);
+            stackBottomTemp = stack.top;
+            stackBottom = stackBottomTemp;
+
+            return rootNode;
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     @Override
@@ -37,7 +103,7 @@ public final class Tree<E> implements ITree<E> {
         /*
         * Return the max number of children its node can have
         */
-        return -1;
+        return arity;
     }
 
     @Override
@@ -45,7 +111,34 @@ public final class Tree<E> implements ITree<E> {
         /*
         * Return the number of nodes in this tree.
         */
-        return -1;
+        if(rootNode == null) return 0;
+
+        // Since root node exist
+        int nodeNum = 1;
+        
+        root();
+        while(!stack.isEmpty()) {
+            TreeNode<E> popNode = stack.pop();
+            stackBottom = stackBottom.getNext();
+
+            for(int j = 0; j < popNode.numChildren(); j++) {
+                nodeNum++;
+                stack.push(popNode.getChild(j));
+                Node<TreeNode<E>> tempNode = new Node(popNode.getChild(j));
+
+                // Queue
+                if(stack.size() == 1) {
+                    stackBottomTemp = stack.top;
+                    stackBottom = stackBottomTemp;
+                } else {
+                    stackBottomTemp.setNext(tempNode);
+                    stackBottomTemp = stackBottomTemp.getNext();
+                    stack.top = stackBottom;
+                }
+            }
+        }
+        
+        return nodeNum;
     }
 
     @Override
@@ -53,7 +146,7 @@ public final class Tree<E> implements ITree<E> {
         /*
         * Return true if this tree is empty.
         */
-        return false;
+        return rootNode == null;
     }
 
     @Override
@@ -63,7 +156,17 @@ public final class Tree<E> implements ITree<E> {
         * If there are no nodes in this tree,
         * raise an IllegalStateException.
         */
-        return -1;
+        if(rootNode == null) throw new IllegalStateException();
+        
+        treeMaxHeight = 0;
+
+        Stack<TreeNode<E>> treeStack = new Stack<>();
+        
+        treeStack.push(rootNode);
+        
+        findHeight(treeStack, 0);
+
+        return treeMaxHeight;
     }
 
     @Override
@@ -74,7 +177,42 @@ public final class Tree<E> implements ITree<E> {
         * *End* means that the leftmost possible slot of
         * smallest depth of this tree.
         */
-        return null;
+        TreeNode<E> insertNode = new TreeNode<>(arity, item);
+        
+        if(rootNode == null) {
+            // Add as root node
+            rootNode = insertNode;
+        } else {
+            root();
+            while(!stack.isEmpty()) {
+                TreeNode<E> popNode = stack.pop();
+                stackBottom = stackBottom.getNext();
+
+                if(popNode.numChildren() < arity) {
+                    insertNode.setParent(popNode);
+                    popNode.insertChild(popNode.numChildren(), insertNode);
+                    return insertNode;
+
+                } else {
+                    for(int j = 0; j < popNode.numChildren(); j++) {
+                        stack.push(popNode.getChild(j));
+                        Node<TreeNode<E>> tempNode = new Node(popNode.getChild(j));
+
+                        // Queue
+                        if(stack.size() == 1) {
+                            stackBottomTemp = stack.top;
+                            stackBottom = stackBottomTemp;
+                        } else {
+                            stackBottomTemp.setNext(tempNode);
+                            stackBottomTemp = stackBottomTemp.getNext();
+                            stack.top = stackBottom;
+                        }
+                    }
+                }
+            }
+        }
+
+        return insertNode;
     }
 
     @Override
@@ -84,6 +222,43 @@ public final class Tree<E> implements ITree<E> {
         * if the node is not in this tree,
         * raise an IllegalArgumentException.
         */
+        
+        // If node is a root node do nothing
+        if(node == rootNode) return;
+
+        if(rootNode != null) {
+            root();
+            while(!stack.isEmpty()) {
+                TreeNode<E> popNode = stack.pop();
+                stackBottom = stackBottom.getNext();
+
+                if(popNode == node) {
+                    for(int i = 0; i < popNode.getParent().numChildren(); i++) {
+                        if(popNode.getParent().getChild(i) == popNode) {
+                            // Detach and exit
+                            popNode.getParent().removeChild(i);
+                            return;
+                        }
+                    }
+                }
+
+                for(int i = 0; i < popNode.numChildren(); i++) {
+                    stack.push(popNode.getChild(i));
+                     Node<TreeNode<E>> tempNode = new Node(popNode.getChild(i));
+                     if(stack.size() == 1) {
+                        stackBottomTemp = stack.top;
+                        stackBottom = stackBottomTemp;
+                    } else {
+                        stackBottomTemp.setNext(tempNode);
+                        stackBottomTemp = stackBottomTemp.getNext();
+                        stack.top = stackBottom;
+                    }
+                }
+
+            }
+        }
+
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -92,7 +267,14 @@ public final class Tree<E> implements ITree<E> {
         * Return the sequence of items visited by preorder traversal.
         * If there are no nodes, return an empty list, NOT NULL.
         */
-        List<E> seq = new ArrayList<>();
+        List<E> seq = new ArrayList<>();        
+        
+        // If root is empty return empty array
+        if(rootNode == null) return seq;
+
+        // Else traverse
+        treePreOrder(rootNode, seq);
+
         return seq;
     }
 
@@ -102,7 +284,15 @@ public final class Tree<E> implements ITree<E> {
         * Return the sequence of items visited by postorder traversal.
         * If there are no nodes, return an empty list, NOT NULL.
         */
-        return null;
+        List<E> seq = new ArrayList<>();
+
+        // If root is empty return empty array
+        if(rootNode == null) return seq;
+
+        // Else traverse
+        treePostOrder(rootNode, seq);
+
+        return seq;
     }
 
     @Override
@@ -111,6 +301,33 @@ public final class Tree<E> implements ITree<E> {
         * Return the sequence of items visited by depthorder traversal.
         * If there are no nodes, return an empty list, NOT NULL.
         */
-        return null;
+        List<E> seq = new ArrayList<>();
+
+        // If root is empty return empty array
+        if(rootNode == null) return seq;
+
+        // Else traverse level by level
+        root();
+        while(!stack.isEmpty()) {
+            TreeNode<E> popNode = stack.pop();
+            stackBottom = stackBottom.getNext();
+            seq.add(popNode.getValue());
+
+            for(int i = 0; i < popNode.numChildren(); i++) {
+                stack.push(popNode.getChild(i));
+                 Node<TreeNode<E>> tempNode = new Node(popNode.getChild(i));
+                 if(stack.size() == 1) {
+                    stackBottomTemp = stack.top;
+                    stackBottom = stackBottomTemp;
+                } else {
+                    stackBottomTemp.setNext(tempNode);
+                    stackBottomTemp = stackBottomTemp.getNext();
+                    stack.top = stackBottom;
+                }
+            }
+
+        }
+
+        return seq;
     }
 }

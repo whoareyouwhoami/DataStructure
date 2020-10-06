@@ -1,6 +1,6 @@
 /*
-* Name:
-* Student ID #:
+* Name: Young Woo Ju
+* Student ID #: 2014122074
 */
 
 /*
@@ -10,18 +10,14 @@
 */
 
 public class PostfixCalc implements ICalc {
-    // public IStack<Integer> stack;
-    public Stack<Integer> stack;
-
+    public IStack<Integer> stack;
     /* Use some variables for your implementation. */
-
 
     public PostfixCalc() {
         this.stack = new Stack<>();
         /*
         * Constructor
         */
-
     }
 
     @Override
@@ -39,6 +35,8 @@ public class PostfixCalc implements ICalc {
         * operators and only non-negative integers, seperated with
         * a single space symbol.
         */
+
+        // Separate space
         String[] stringArr = expression.split(" ");
 
         for(int i = 0; i < stringArr.length; i++) {
@@ -48,13 +46,13 @@ public class PostfixCalc implements ICalc {
                 stack.push(pushVal);
 
             } catch(NumberFormatException e) {
-                // If string is an operand, pop 2 values
+                // If string is an operator, pop 2 values
                 int popVal1 = stack.pop();
                 int popVal2 = stack.pop();
 
                 // Do calculation
                 switch(stringArr[i]) {
-                    case "×": popVal2 *= popVal1;
+                    case "*": popVal2 *= popVal1;
                     break;
                     case "+": popVal2 += popVal1;
                     break;
@@ -66,11 +64,6 @@ public class PostfixCalc implements ICalc {
                 stack.push(popVal2);
             }
         }
-
-
-
-        stack.show();
-
 
         return stack.pop();
     }

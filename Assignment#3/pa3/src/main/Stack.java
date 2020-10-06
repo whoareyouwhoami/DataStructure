@@ -1,6 +1,6 @@
 /*
- * Name: 
- * Student ID #: 
+ * Name: Young Woo Ju
+ * Student ID #: 2014122074
  */
 
 /* 
@@ -24,16 +24,6 @@ public final class Stack<E> implements IStack<E> {
         this.top = top;
     }
 
-    // DELETE THIS LATER
-    public void show() {
-        Node x = top;
-        while(x != null) {
-            System.out.print(x.getValue() + " ");
-            x = x.getNext();
-        }
-        System.out.println();
-    }
-
     @Override
     public void push(E item) {
         /*
@@ -46,7 +36,6 @@ public final class Stack<E> implements IStack<E> {
 
         // Stacking node
         Node<E> insertNode = new Node(item);
-        System.out.println("Pushed: " + item);
 
         if(top == null) { // When stack is first inserted
             top = insertNode;
@@ -55,7 +44,8 @@ public final class Stack<E> implements IStack<E> {
             top = insertNode;
         }
         
-        stackSize++;   
+        // Increase stack size
+        stackSize++; 
     }
 
     @Override
@@ -77,11 +67,11 @@ public final class Stack<E> implements IStack<E> {
             // Reduce stack size
             stackSize--;
 
-            System.out.println("Popped: " + result);
+            // System.out.println("Popped: " + result);
             return result;
         }
 
-        throw new IllegalStateException("NO NODE BRO");
+        throw new IllegalStateException();
     }
 
     @Override

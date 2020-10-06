@@ -46,10 +46,10 @@ public class CafeTests {
             assertThat(cafe.stat(), is(4));
             // time 4
             assertThat(cafe.serve(), is(3));
-            assertThat(cafe.stat(), is(6));
+            assertThat(cafe.stat(), is(7));
             // time 5
             assertThat(cafe.serve(), is(4));
-            assertThat(cafe.stat(), is(8));
+            assertThat(cafe.stat(), is(10));
         });
     }
 }

@@ -22,7 +22,7 @@ public class PostfixCalcTests {
     public void testEvaluate() {
         assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
             ICalc calc = new PostfixCalc();
-            assertThat(calc.evaluate("5 10 4 × +"), is(45));
+            assertThat(calc.evaluate("5 10 4 * +"), is(45));
             assertThat(calc.evaluate("1 2 -"), is(-1));
         });
     }
