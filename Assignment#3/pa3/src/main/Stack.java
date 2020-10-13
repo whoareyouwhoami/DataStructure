@@ -67,7 +67,6 @@ public final class Stack<E> implements IStack<E> {
             // Reduce stack size
             stackSize--;
 
-            // System.out.println("Popped: " + result);
             return result;
         }
 

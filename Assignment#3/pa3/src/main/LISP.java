@@ -51,8 +51,13 @@ public final class LISP implements ILISP {
         // Convert string to char
         char[] charArr = expression.toCharArray();
 
+
+        // Will stack from the end
         for(int i = charArr.length - 1; i >= 0; i--) {
+            // Input brackets
             char bracket = charArr[i];
+
+            // Check bracket position in bracket types
             int bracketIndex = getBracketIndex(bracket);
             
             if(bracketIndex % 2 == 0) { // Open bracket
@@ -61,10 +66,12 @@ public final class LISP implements ILISP {
                     char charCompare = stack.pop();
                     int compareIndex = getBracketIndex(charCompare);
 
+                    // Since difference betweem open bracket and closed 
                     if(compareIndex - bracketIndex != 1) {
                         return false;
                     }
-                } catch(IllegalStateException e) {
+                    
+                } catch(IllegalStateException e) { // If bracket is other than (), {}, []
                     return false;
                 }
 
@@ -73,6 +80,8 @@ public final class LISP implements ILISP {
                 stack.push(bracket);
             }
         }
+
+        // Return true is all brackets match
         if(stack.isEmpty()) {
             return true;
         }

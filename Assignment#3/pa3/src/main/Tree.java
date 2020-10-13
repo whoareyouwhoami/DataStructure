@@ -21,7 +21,7 @@ public final class Tree<E> implements ITree<E> {
     // Root node
     private TreeNode<E> rootNode;
 
-    // Stack
+    // For queue implementation
     private Node<TreeNode<E>> stackBottom;
     private Node<TreeNode<E>> stackBottomTemp;
     private Stack<TreeNode<E>> stack;
@@ -60,22 +60,28 @@ public final class Tree<E> implements ITree<E> {
     }
 
     /*
-     * Pre-order
+     * Pre-order traversal
      */
     private void treePreOrder(TreeNode<E> node, List<E> result) {
+        // Add node value
         result.add(node.getValue());
+
+        // Search node's children
         for(int i = 0; i < node.numChildren(); i++) {
             treePreOrder(node.getChild(i), result);
         }
     }
 
     /*
-     * Post-order
+     * Post-order traversal
      */
     private void treePostOrder(TreeNode<E> node, List<E> result) {
+        // Search node's children
         for(int i = 0; i < node.numChildren(); i++) {
             treePostOrder(node.getChild(i), result);
         }
+
+        // Add node value
         result.add(node.getValue());
     }
 
@@ -86,7 +92,7 @@ public final class Tree<E> implements ITree<E> {
         * If there is no root, raise an IllegalStateException.
         */
         if(rootNode != null) {
-            // If root exist, create a stack
+            // If root exist, create a stack (for queue implementation later)
             stack = new Stack<>();
             stack.push(rootNode);
             stackBottomTemp = stack.top;
@@ -116,12 +122,18 @@ public final class Tree<E> implements ITree<E> {
         // Since root node exist
         int nodeNum = 1;
         
+        // Add root to queue
         root();
+
+        // While queue is not empty
         while(!stack.isEmpty()) {
+            // queue.poll()
             TreeNode<E> popNode = stack.pop();
             stackBottom = stackBottom.getNext();
 
+            // For each polled node, get children
             for(int j = 0; j < popNode.numChildren(); j++) {
+                // Add children 
                 nodeNum++;
                 stack.push(popNode.getChild(j));
                 Node<TreeNode<E>> tempNode = new Node(popNode.getChild(j));
@@ -158,12 +170,14 @@ public final class Tree<E> implements ITree<E> {
         */
         if(rootNode == null) throw new IllegalStateException();
         
+        // Initialize max height
         treeMaxHeight = 0;
 
+        // Create stack and push root
         Stack<TreeNode<E>> treeStack = new Stack<>();
-        
         treeStack.push(rootNode);
         
+        // Find height
         findHeight(treeStack, 0);
 
         return treeMaxHeight;
@@ -183,17 +197,26 @@ public final class Tree<E> implements ITree<E> {
             // Add as root node
             rootNode = insertNode;
         } else {
+            // Initialize a queue with root 
             root();
+
+            // While queue is not empty
             while(!stack.isEmpty()) {
+
+                // queue.poll()
                 TreeNode<E> popNode = stack.pop();
                 stackBottom = stackBottom.getNext();
 
+                // If the node's children is less than arity
+                // INSERT item as polled node's children
                 if(popNode.numChildren() < arity) {
                     insertNode.setParent(popNode);
                     popNode.insertChild(popNode.numChildren(), insertNode);
-                    return insertNode;
 
+                    return insertNode;
                 } else {
+                    // When polled node's children reaches arity
+                    // Add its children to the queue
                     for(int j = 0; j < popNode.numChildren(); j++) {
                         stack.push(popNode.getChild(j));
                         Node<TreeNode<E>> tempNode = new Node(popNode.getChild(j));
@@ -223,42 +246,50 @@ public final class Tree<E> implements ITree<E> {
         * raise an IllegalArgumentException.
         */
         
-        // If node is a root node do nothing
-        if(node == rootNode) return;
+        // If node is a root node make a root null
+        if(node == rootNode) {
+            rootNode = null;
+        } else {
+            if(rootNode != null) {
+                // Initialize a queue with root 
+                root();
+                while(!stack.isEmpty()) {
+                    TreeNode<E> popNode = stack.pop();
+                    stackBottom = stackBottom.getNext();
 
-        if(rootNode != null) {
-            root();
-            while(!stack.isEmpty()) {
-                TreeNode<E> popNode = stack.pop();
-                stackBottom = stackBottom.getNext();
-
-                if(popNode == node) {
-                    for(int i = 0; i < popNode.getParent().numChildren(); i++) {
-                        if(popNode.getParent().getChild(i) == popNode) {
-                            // Detach and exit
-                            popNode.getParent().removeChild(i);
-                            return;
+                    // If polled node is same as detach node
+                    if(popNode == node) {
+                        // Get the node's child position by accessing it's parent's node
+                        for(int i = 0; i < popNode.getParent().numChildren(); i++) {
+                            if(popNode.getParent().getChild(i) == popNode) {
+                                // Detach and exit
+                                popNode.getParent().removeChild(i);
+                                return;
+                            }
                         }
                     }
-                }
 
-                for(int i = 0; i < popNode.numChildren(); i++) {
-                    stack.push(popNode.getChild(i));
-                     Node<TreeNode<E>> tempNode = new Node(popNode.getChild(i));
-                     if(stack.size() == 1) {
-                        stackBottomTemp = stack.top;
-                        stackBottom = stackBottomTemp;
-                    } else {
-                        stackBottomTemp.setNext(tempNode);
-                        stackBottomTemp = stackBottomTemp.getNext();
-                        stack.top = stackBottom;
+                    // ELSE
+                    // If polled node is NOT SAME as detach node
+                    // add it's children to queue
+                    for(int i = 0; i < popNode.numChildren(); i++) {
+                        stack.push(popNode.getChild(i));
+                         Node<TreeNode<E>> tempNode = new Node(popNode.getChild(i));
+
+                         if(stack.size() == 1) {
+                            stackBottomTemp = stack.top;
+                            stackBottom = stackBottomTemp;
+                        } else {
+                            stackBottomTemp.setNext(tempNode);
+                            stackBottomTemp = stackBottomTemp.getNext();
+                            stack.top = stackBottom;
+                        }
                     }
+
                 }
-
             }
+            throw new IllegalArgumentException();
         }
-
-        throw new IllegalArgumentException();
     }
 
     @Override
@@ -267,8 +298,10 @@ public final class Tree<E> implements ITree<E> {
         * Return the sequence of items visited by preorder traversal.
         * If there are no nodes, return an empty list, NOT NULL.
         */
+
+        // Create array
         List<E> seq = new ArrayList<>();        
-        
+
         // If root is empty return empty array
         if(rootNode == null) return seq;
 
@@ -284,6 +317,8 @@ public final class Tree<E> implements ITree<E> {
         * Return the sequence of items visited by postorder traversal.
         * If there are no nodes, return an empty list, NOT NULL.
         */
+
+        // Create array
         List<E> seq = new ArrayList<>();
 
         // If root is empty return empty array
@@ -301,6 +336,8 @@ public final class Tree<E> implements ITree<E> {
         * Return the sequence of items visited by depthorder traversal.
         * If there are no nodes, return an empty list, NOT NULL.
         */
+
+        // Create array
         List<E> seq = new ArrayList<>();
 
         // If root is empty return empty array
@@ -316,6 +353,7 @@ public final class Tree<E> implements ITree<E> {
             for(int i = 0; i < popNode.numChildren(); i++) {
                 stack.push(popNode.getChild(i));
                  Node<TreeNode<E>> tempNode = new Node(popNode.getChild(i));
+
                  if(stack.size() == 1) {
                     stackBottomTemp = stack.top;
                     stackBottom = stackBottomTemp;
@@ -327,7 +365,6 @@ public final class Tree<E> implements ITree<E> {
             }
 
         }
-
         return seq;
     }
 }

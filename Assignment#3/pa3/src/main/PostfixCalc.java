@@ -11,13 +11,25 @@
 
 public class PostfixCalc implements ICalc {
     public IStack<Integer> stack;
-    /* Use some variables for your implementation. */
 
+    /* Use some variables for your implementation. */
+    String[] operators = {"+", "-", "*"};
+    
     public PostfixCalc() {
         this.stack = new Stack<>();
         /*
         * Constructor
         */
+    }
+
+    /*
+     * Checks if input string is part of operators (+, -, *)
+     */
+    private boolean checkOperators(String operator) {
+        for(String s: operators) {
+            if(operator.equals(s)) return true;
+        }
+        return false;
     }
 
     @Override
@@ -46,22 +58,28 @@ public class PostfixCalc implements ICalc {
                 stack.push(pushVal);
 
             } catch(NumberFormatException e) {
-                // If string is an operator, pop 2 values
-                int popVal1 = stack.pop();
-                int popVal2 = stack.pop();
+                // Check if valid operator
+                if(checkOperators(stringArr[i])) {
+                    // Since string is an operator, pop 2 values
+                    int popVal1 = stack.pop();
+                    int popVal2 = stack.pop();
 
-                // Do calculation
-                switch(stringArr[i]) {
-                    case "*": popVal2 *= popVal1;
-                    break;
-                    case "+": popVal2 += popVal1;
-                    break;
-                    case "-": popVal2 = popVal2 - popVal1;
-                    break;
+                    // Do calculation
+                    switch(stringArr[i]) {
+                        case "*": popVal2 *= popVal1;
+                        break;
+                        case "+": popVal2 += popVal1;
+                        break;
+                        case "-": popVal2 = popVal2 - popVal1;
+                        break;
+                    }
+
+                    // Push back the result to stack
+                    stack.push(popVal2);
                 }
 
-                // Push back the result to stack
-                stack.push(popVal2);
+                // Else ... (no else due to input conditions)
+                // Will need to update output if else condition exist
             }
         }
 
