@@ -18,6 +18,13 @@ public final class Hash<K> implements IHash<K> {
     /*
     * Use some variables for your implementation.
     */
+    
+    private IHashFunction<K> hashFunc;
+    private IResizeFunction resizeFunc;
+    private int tableSize = 0;
+    private int itemSize = 0;
+    private K[] hashTable;
+    
     public Hash(IHashFunction<K> h, IResizeFunction ex, int tablesize) {
         /*
          * Constructor
@@ -30,6 +37,51 @@ public final class Hash<K> implements IHash<K> {
          *      int ex.extendTable(int tablesize): returns new tablesize for extended table.
          *  + tablesize: the initial table size of the hash table.
         */
+        
+        // Declaring variables
+        this.hashFunc = h;
+        this.resizeFunc = ex;
+        this.tableSize = tablesize;
+
+        // Creating table array
+        this.hashTable = createHashTable(tableSize);
+
+        for(int i = 0; i < tableSize; i++) {
+            hashTable[i] = null;
+        }
+    }
+    
+    private K[] createHashTable(int tableSize) {
+        K[] table = (K[]) new Object[tableSize];
+        
+        for(int i = 0; i < tableSize; i++) {
+            table[i] = null;
+        }
+
+        return table;
+    }
+
+    private void linearProbing(K[] hashTable, K key, int hashCode) {
+        // Since current hascode is not empty, start with next index
+        int start = hashCode + 1;
+        
+        // Looping array
+        while(start != hashCode) {
+            // If index reached end of table, set the index to 0
+            if(start >= tableSize) {
+                start = 0;
+            }
+
+            // If slot is empty, insert the value and exit
+            if(hashTable[start] == null) {
+                hashTable[start] = key;
+                return;
+            }
+
+            start++;
+        }
+        // This will never happen
+        System.out.println("SIZE LIMIT ERROR");
     }
 
     @Override
@@ -45,6 +97,52 @@ public final class Hash<K> implements IHash<K> {
          *  To decide whether two keys are equal,
          *  you must use _key.equals_ method.
          */
+         
+         // If key exist, return nothing
+        if(exists(key)) {
+            System.out.println("Key already exists...");
+            return;
+        }
+
+        // Get hash code from the key
+        int hashCode = hashFunc.hash(key, tableSize);
+        
+        // Hashing and inserting
+        if(hashTable[hashCode] == null) {
+            hashTable[hashCode] = key;
+        } else {
+            linearProbing(hashTable, key, hashCode);
+        }
+
+        // Increase item size
+        itemSize++;
+
+        // If hash table has to be extended
+        if(resizeFunc.checkResize(tableSize, itemSize)) {
+            System.out.println(">>> Increasing table size and rehashing");
+
+            // Set a new table size
+            tableSize = resizeFunc.extendTable(tableSize);
+
+            // Create new table array
+            K[] hashTable_temp = createHashTable(tableSize);
+
+            // Rehashing
+            for(int i = 0; i < hashTable.length; i++) {
+                if(hashTable[i] != null) {
+                    int hashCode_temp = hashFunc.hash(hashTable[i], tableSize);
+
+                    if(hashTable_temp[hashCode_temp] == null) {
+                        hashTable_temp[hashCode_temp] = hashTable[i];
+                    } else {
+                        linearProbing(hashTable_temp, hashTable[i], hashCode_temp);
+                    }
+
+                }
+            }
+            // Assign extended table to current table
+            hashTable = hashTable_temp;
+        }
     }
 
     @Override
@@ -59,6 +157,36 @@ public final class Hash<K> implements IHash<K> {
         *  you must use _key.equals_ method.
         *  If the key does not exist in the table, raise an exception.
         */
+        
+        // Get hash code of removal key
+        int hashCode = hashFunc.hash(key, tableSize);
+
+        // Get table size for looping 
+        int limit = tablesize();
+
+        // Scanning whole table to check if the removal key exist
+        while(limit >= 0) {
+            // If hash table has a key and its key is same as removal key, remove it and exit 
+            if(hashTable[hashCode] != null && hashTable[hashCode].equals(key)) {
+                hashTable[hashCode] = null;
+                itemSize--;
+                return;
+            }
+
+            // Increment index to check next slot
+            hashCode++;
+
+            // If index reaches the end of table, reset it to start from 0
+            if(hashCode >= tableSize) {
+                hashCode = 0;
+            }
+
+            // Decrement number of scannings
+            limit--;
+        }
+
+        // Throw exception when key nothing is returned in while loop
+        throw new IllegalStateException("Key doesn't exist!");
     }
 
     @Override
@@ -72,6 +200,28 @@ public final class Hash<K> implements IHash<K> {
         *  To decide whether two keys are equal,
         *  you must use _key.equals_ method.
         */
+        
+        // Get hash code
+        int hashCode = hashFunc.hash(key, tableSize);
+
+        // For looping the table
+        int limit = tablesize();
+
+        // Scan throughout the table to check the key
+        while(limit >= 0) {
+            if(hashTable[hashCode] != null && hashTable[hashCode].equals(key)) {
+                return true;
+            }
+
+            hashCode++;
+
+            if(hashCode >= tableSize) {
+                hashCode = 0;
+            }
+
+            limit--;
+        }
+
         return false;
     }
 
@@ -81,7 +231,7 @@ public final class Hash<K> implements IHash<K> {
         * Job:
         *  Return the number of items in the hashtable.
         */
-        return -1;
+        return itemSize;
     }
 
     @Override
@@ -90,7 +240,7 @@ public final class Hash<K> implements IHash<K> {
         * Job:
         *  Return the size of current hashtable.
         */
-        return -1;
+        return tableSize;
     }
 
     @Override
@@ -102,7 +252,14 @@ public final class Hash<K> implements IHash<K> {
         *  If a bucket has no item, assign null.
         *  Note that you can use ArrayList.
         */
-        return null;
+        
+        List<K> items = new ArrayList<>();
+
+        for(K code: hashTable) {
+            items.add(code);
+        }
+
+        return items;
     }
 
 }
