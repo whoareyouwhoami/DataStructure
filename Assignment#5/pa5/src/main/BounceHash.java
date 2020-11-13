@@ -1,6 +1,6 @@
 /*
-* Name:
-* Student ID#:
+* Name: Young Woo Ju
+* Student ID#: 2014122074
 */
 
 import java.lang.Math;
@@ -139,6 +139,11 @@ public final class BounceHash<K> implements IHash<K> {
          *  To decide whether two keys are equal,
          *  you must use _key.equals_ method.
          */
+
+        // If a key exist, exit
+        if(exists(key)) {
+            return;
+        }
 
         // Get hash code for input key
         int hashCode1 = hashFunc.hash1(key, tableSize);

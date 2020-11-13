@@ -1,6 +1,6 @@
 /*
-* Name:
-* Student ID#:
+* Name: Young Woo Ju
+* Student ID#: 2014122074
 */
 
 import java.lang.Math;
@@ -80,8 +80,6 @@ public final class Hash<K> implements IHash<K> {
 
             start++;
         }
-        // This will never happen
-        System.out.println("SIZE LIMIT ERROR");
     }
 
     @Override
@@ -100,7 +98,6 @@ public final class Hash<K> implements IHash<K> {
          
          // If key exist, return nothing
         if(exists(key)) {
-            System.out.println("Key already exists...");
             return;
         }
 
@@ -119,8 +116,6 @@ public final class Hash<K> implements IHash<K> {
 
         // If hash table has to be extended
         if(resizeFunc.checkResize(tableSize, itemSize)) {
-            System.out.println(">>> Increasing table size and rehashing");
-
             // Set a new table size
             tableSize = resizeFunc.extendTable(tableSize);
 
@@ -186,7 +181,7 @@ public final class Hash<K> implements IHash<K> {
         }
 
         // Throw exception when key nothing is returned in while loop
-        throw new IllegalStateException("Key doesn't exist!");
+        throw new IllegalStateException();
     }
 
     @Override
