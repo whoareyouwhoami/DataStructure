@@ -34,9 +34,9 @@ public class SCCTests {
     @Score(1)
     void testconnectivity() {
         assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
-            ISCC G = new SCC("./src/text/graph2.txt");
+            ISCC G = new SCC("./src/test/graph2.txt");
             assertThat(G.connectivity(), is(false));
-            ISCC G2 = new SCC("./src/text/graph3.txt");
+            ISCC G2 = new SCC("./src/test/graph3.txt");
             assertThat(G2.connectivity(), is(true));
         });
     }
